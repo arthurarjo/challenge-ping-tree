@@ -40,6 +40,16 @@ test.serial.cb('shoud get all targets', function (t) {
   })
 })
 
+test.serial.cb('shoud get a target', function (t) {
+  var url = '/api/targets/1'
+  servertest(server(), url, { encoding: 'json' }, function (err, res) {
+    t.falsy(err, 'no error')
+    t.is(res.statusCode, 200, 'correct statusCode')
+    t.deepEqual(res.body, defaultTarget, 'correct body content')
+    t.end()
+  })
+})
+
 test.serial.cb('shoud create a target', function (t) {
   var url = '/api/targets'
   var st = servertest(server(), url, { method: 'POST' })
