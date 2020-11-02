@@ -1,5 +1,7 @@
 process.env.NODE_ENV = 'test'
 
+var fs = require('fs')
+var bl = require('bl')
 var test = require('ava')
 var servertest = require('servertest')
 
@@ -36,4 +38,15 @@ test.serial.cb('shoud get all targets', function (t) {
       t.end()
     })
   })
+})
+
+test.serial.cb('shoud create a target', function (t) {
+  var url = '/api/targets'
+  var st = servertest(server(), url, { method: 'POST' })
+  fs.createReadStream(`${__dirname}/defaultTarget.json`).pipe(st)
+  st.pipe(bl(function (err, data) {
+    t.falsy(err, 'no-model-error')
+    t.is(data.toString(), '"OK"', 'target created')
+    t.end()
+  }))
 })

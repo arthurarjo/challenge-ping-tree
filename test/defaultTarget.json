@@ -1,0 +1,7 @@
+{
+  "id": "targets:1",
+  "url": "http://example.com",
+  "value": "0.50",
+  "maxAcceptsPerDay": "10",
+  "accept": "true"
+}
