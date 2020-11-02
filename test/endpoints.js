@@ -9,7 +9,7 @@ var server = require('../lib/server')
 var targetsModel = require('../lib/models/targets')
 
 var defaultTarget = {
-  id: 'targets:1',
+  id: '1',
   url: 'http://example.com',
   value: '0.50',
   maxAcceptsPerDay: '10',
@@ -40,8 +40,8 @@ test.serial.cb('shoud get all targets', function (t) {
   })
 })
 
-test.serial.cb('shoud get a target', function (t) {
-  var url = '/api/targets/1'
+test.serial.cb('shoud get a target by id', function (t) {
+  var url = '/api/target/1'
   servertest(server(), url, { encoding: 'json' }, function (err, res) {
     t.falsy(err, 'no error')
     t.is(res.statusCode, 200, 'correct statusCode')
@@ -52,6 +52,17 @@ test.serial.cb('shoud get a target', function (t) {
 
 test.serial.cb('shoud create a target', function (t) {
   var url = '/api/targets'
+  var st = servertest(server(), url, { method: 'POST' })
+  fs.createReadStream(`${__dirname}/defaultTarget.json`).pipe(st)
+  st.pipe(bl(function (err, data) {
+    t.falsy(err, 'no-model-error')
+    t.is(data.toString(), '"OK"', 'target created')
+    t.end()
+  }))
+})
+
+test.serial.cb('shoud update a target', function (t) {
+  var url = '/api/target/1'
   var st = servertest(server(), url, { method: 'POST' })
   fs.createReadStream(`${__dirname}/defaultTarget.json`).pipe(st)
   st.pipe(bl(function (err, data) {
