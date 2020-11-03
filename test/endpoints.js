@@ -12,8 +12,16 @@ var defaultTarget = {
   id: '1',
   url: 'http://example.com',
   value: '0.50',
-  maxAcceptsPerDay: '10',
-  accept: 'true'
+  maxAcceptsPerDay: '3',
+  accept: {
+    geoState: {
+      $in: ['ca', 'ny']
+    },
+    hour: {
+      $in: ['13', '14', '15']
+    }
+  },
+  visits: '0'
 }
 
 test.serial.cb('healthcheck', function (t) {
@@ -34,7 +42,21 @@ test.serial.cb('shoud get all targets', function (t) {
     servertest(server(), url, { encoding: 'json' }, function (err, res) {
       t.falsy(err, 'no error')
       t.is(res.statusCode, 200, 'correct statusCode')
-      t.deepEqual(res.body, [defaultTarget], 'correct body content')
+      t.deepEqual(res.body, [{
+        accept: {
+          geoState: {
+            $in: ['ca', 'ny']
+          },
+          hour: {
+            $in: ['13', '14', '15']
+          }
+        },
+        id: '1',
+        url: 'http://example.com',
+        value: '0.50',
+        maxAcceptsPerDay: '3',
+        visits: '0'
+      }], 'correct body content')
       t.end()
     })
   })
@@ -45,7 +67,21 @@ test.serial.cb('shoud get a target by id', function (t) {
   servertest(server(), url, { encoding: 'json' }, function (err, res) {
     t.falsy(err, 'no error')
     t.is(res.statusCode, 200, 'correct statusCode')
-    t.deepEqual(res.body, defaultTarget, 'correct body content')
+    t.deepEqual(res.body, {
+      accept: {
+        geoState: {
+          $in: ['ca', 'ny']
+        },
+        hour: {
+          $in: ['13', '14', '15']
+        }
+      },
+      id: '1',
+      url: 'http://example.com',
+      value: '0.50',
+      maxAcceptsPerDay: '3',
+      visits: '0'
+    }, 'correct body content')
     t.end()
   })
 })
@@ -68,6 +104,20 @@ test.serial.cb('shoud update a target', function (t) {
   st.pipe(bl(function (err, data) {
     t.falsy(err, 'no-model-error')
     t.is(data.toString(), '"OK"', 'target created')
+    t.end()
+  }))
+})
+
+test.serial.cb('shoud get a target url', function (t) {
+  var url = '/route'
+  var st = servertest(server(), url, { method: 'POST' })
+  fs.createReadStream(`${__dirname}/defaultVisitor.json`).pipe(st)
+  st.pipe(bl(function (err, data) {
+    t.falsy(err, 'no-model-error')
+    t.deepEqual(JSON.parse(data.toString()), {
+      decision: 'approved',
+      url: 'http://example.com'
+    }, 'decision approved')
     t.end()
   }))
 })
