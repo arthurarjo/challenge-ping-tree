@@ -115,9 +115,9 @@ test.serial.cb('shoud get a target url', function (t) {
   st.pipe(bl(function (err, data) {
     t.falsy(err, 'no-model-error')
     t.deepEqual(JSON.parse(data.toString()), {
-      decision: 'approved',
+      decision: 'accept',
       url: 'http://example.com'
-    }, 'decision approved')
+    }, 'decision accept')
     t.end()
   }))
 })
